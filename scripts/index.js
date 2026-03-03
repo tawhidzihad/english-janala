@@ -1,3 +1,18 @@
+const createElements = (arr) => {
+  const htmlElemetns = arr.map((el) => `<span class="btn">${el}</span>`);
+  return htmlElemetns.join(" ");
+};
+
+const manageSpinner = (status) => {
+  if (status == true) {
+    document.getElementById("spinner").classList.remove("hidden");
+    document.getElementById("word_container").classList.add("hidden");
+  } else {
+    document.getElementById("spinner").classList.add("hidden");
+    document.getElementById("word_container").classList.remove("hidden");
+  }
+}
+
 const loadlessons = () => {
   fetch("https://openapi.programming-hero.com/api/levels/all")
     .then((res) => res.json())
@@ -6,22 +21,56 @@ const loadlessons = () => {
 
 const removeActive = () => {
   const lessonButtons = document.querySelectorAll(".lesson_btn");
-  lessonButtons.forEach(btn => btn.classList.remove("active"));
+  lessonButtons.forEach((btn) => btn.classList.remove("active"));
 };
 
-
 const loadLevelWord = (id) => {
+  manageSpinner(true);
   const url = `https://openapi.programming-hero.com/api/level/${id}`;
   fetch(url)
     .then((res) => res.json())
     .then((jsonFile) => {
-      
       removeActive(); // remove all active button, byt calling functuion
 
       const clickBtn = document.getElementById(`lesson_btn_${id}`);
       clickBtn.classList.add("active"); // add active button now
       displayLevelWords(jsonFile.data);
     });
+};
+
+const loadWordDetail = async (id) => {
+  const url = `https://openapi.programming-hero.com/api/word/${id}`;
+  const res = await fetch(url);
+  const details = await res.json();
+
+  displayWordDetails(details.data);
+};
+
+
+const displayWordDetails = (word) => {
+  const detailsBox = document.getElementById("details_container");
+  detailsBox.innerHTML = `
+    <div class="">
+      <h2 class="text-2xl font-semibold">${word.word} (<i class="fa-solid fa-microphone-lines"></i> : ${word.pronunciation})</h2>
+    </div>
+
+    <div class="">
+      <h2 class="font-light">Meaning</h2>
+      <p class="font_bangla font-medium text-2xl">${word.meaning}</p>
+    </div>
+
+    <div class="">
+      <h2 class="font-semibold">Example</h2>
+      <p>${word.sentence}</p>
+    </div>
+
+    <div class="space-y-1">
+      <h2 class="font-semibold font_bangla">সমার্থক শব্দ গুলো</h2>
+      <div class="">${createElements(word.synonyms)}</div>
+    </div>
+  `;
+
+  document.getElementById("my_modal_5").showModal();
 };
 
 
@@ -38,6 +87,7 @@ const displayLevelWords = (words) => {
         <h2 class="font-bold text-4xl font_bangla">নেক্সট Lesson এ যান</h2>
       </div>
     `;
+    manageSpinner(false);
     return;
   }
 
@@ -55,13 +105,14 @@ const displayLevelWords = (words) => {
         ${word.pronunciation ? word.pronunciation : "উচ্চারণ পাওয়া যায়নি"}"</div>
 
         <div class="flex justify-between items-center">
-          <button class="btn bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-circle-info"></i></button>
+          <button onclick="loadWordDetail(${word.id})" class="btn bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-circle-info"></i></button>
           <button class="btn bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-volume-high"></i></i></button>
         </div>
       </div>
     `;
     wordContainer.appendChild(card);
   });
+  manageSpinner(false);
 };
 
 
