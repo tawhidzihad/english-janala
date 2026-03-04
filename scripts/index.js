@@ -5,6 +5,15 @@ const createElements = (arr) => {
   return htmlElemetns.join(" ");
 };
 
+//! get pronounce in sound 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  const voices = speechSynthesis.getVoices();
+  utterance.voice = voices[10] //*Can change voices.
+  utterance.lang = "en-EN"; //* Can change english accent.
+  window.speechSynthesis.speak(utterance);
+}
+
 const manageSpinner = (status) => {
   if (status == true) {
     document.getElementById("spinner").classList.remove("hidden");
@@ -108,7 +117,7 @@ const displayLevelWords = (words) => {
 
         <div class="flex justify-between items-center">
           <button onclick="loadWordDetail(${word.id})" class="btn btn-square bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-circle-info"></i></button>
-          <button class="btn btn-square bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-volume-high"></i></i></button>
+          <button onclick="pronounceWord('${word.word}')" class="btn btn-square bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-volume-high"></i></i></button>
         </div>
       </div>
     `;
@@ -156,7 +165,7 @@ document.getElementById("search_btn").addEventListener("click", () => {
       const filterWords = allWords.filter((words) =>
         words.word.toLowerCase().includes(searchValue)
       );
-      
+
       displayLevelWords(filterWords);
     });
   }
