@@ -1,5 +1,7 @@
 const createElements = (arr) => {
-  const htmlElemetns = arr.map((el) => `<span class="btn">${el}</span>`);
+  const htmlElemetns = arr.map(
+    (el) => `<span class="btn btn-outline btn-info hover:text-white mb-1">${el}</span>`,
+  );
   return htmlElemetns.join(" ");
 };
 
@@ -105,8 +107,8 @@ const displayLevelWords = (words) => {
         ${word.pronunciation ? word.pronunciation : "উচ্চারণ পাওয়া যায়নি"}"</div>
 
         <div class="flex justify-between items-center">
-          <button onclick="loadWordDetail(${word.id})" class="btn bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-circle-info"></i></button>
-          <button class="btn bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-volume-high"></i></i></button>
+          <button onclick="loadWordDetail(${word.id})" class="btn btn-square bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-circle-info"></i></button>
+          <button class="btn btn-square bg-[#1A91FF20] hover:bg-[#1A91FF90]"><i class="fa-solid fa-volume-high"></i></i></button>
         </div>
       </div>
     `;
@@ -139,3 +141,23 @@ const displaylessons = (lessons) => {
 };
 
 loadlessons();
+
+document.getElementById("search_btn").addEventListener("click", () => {
+  removeActive();
+  const input = document.getElementById("search_input");
+  const searchValue = input.value.trim().toLowerCase();
+
+  if (searchValue.length > 0) {
+    fetch("https://openapi.programming-hero.com/api/words/all")
+    .then(res => res.json())
+    .then(data => {
+      const allWords = data.data;
+        
+      const filterWords = allWords.filter((words) =>
+        words.word.toLowerCase().includes(searchValue)
+      );
+      
+      displayLevelWords(filterWords);
+    });
+  }
+})
